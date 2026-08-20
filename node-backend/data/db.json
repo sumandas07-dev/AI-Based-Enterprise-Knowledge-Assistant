@@ -1,0 +1,133 @@
+{
+  "documents": [],
+  "conversations": [
+    {
+      "id": "f64e9910-d0ad-4d74-b37f-2402355cc50c",
+      "title": "What is the company leave...",
+      "createdAt": "2026-08-19T06:38:13.863Z",
+      "updatedAt": "2026-08-19T06:38:28.793Z",
+      "messages": [
+        {
+          "id": "528dd3d0-4733-403a-bb28-48e838ab0c97",
+          "sender": "user",
+          "content": "What is the company leave policy?",
+          "createdAt": "2026-08-19T06:38:13.865Z"
+        },
+        {
+          "id": "c3fee6f7-53ce-4831-80b8-28e0513b895e",
+          "sender": "assistant",
+          "content": "I apologize, but I encountered a configuration error (likely missing GROQ_API_KEY) while attempting to synthesize the answer.",
+          "sources": [
+            {
+              "document_id": "policy-testing-doc",
+              "filename": "TCS-Global-Policy-Corporate-Social-Responsibility.pdf",
+              "page": 10,
+              "relevance": 0.7109770774999999,
+              "relevanceScore": 0.7109770774999999,
+              "preview": "Header: 9 Policy Review\n\nThe policy shall be subject to review as may be deemed necessary and in accordance with any regulatory amendments. Key managerial personnel may review the policy from time to time."
+            },
+            {
+              "document_id": "policy-testing-doc",
+              "filename": "TCS-Global-Policy-Corporate-Social-Responsibility.pdf",
+              "page": 1,
+              "relevance": 0.708767414,
+              "relevanceScore": 0.708767414,
+              "preview": "Header: Scope of the Policy\n\nThis Policy is applicable to all of TCS’ global operations including the subsidiaries of the Company and will ensure compliance to all regulations in these respective regions. For India, the Policy will be operative within the overall ambit of the CSR..."
+            },
+            {
+              "document_id": "policy-testing-doc",
+              "filename": "TCS-Global-Policy-Corporate-Social-Responsibility.pdf",
+              "page": 7,
+              "relevance": 0.6795320659999999,
+              "relevanceScore": 0.6795320659999999,
+              "preview": "Header: 5 Governance\n\nThe CSR Committee shall:\n\nFormulate and recommend to the Board and periodically review the CSR Policy\n\nFormulate and recommend the annual action plan.\n\nIndicate the list of activities to be undertaken by the Company in areas or subject. For India, this will ..."
+            },
+            {
+              "document_id": "policy-testing-doc",
+              "filename": "TCS-Global-Policy-Corporate-Social-Responsibility.pdf",
+              "page": 2,
+              "relevance": 0.6667285000000001,
+              "relevanceScore": 0.6667285000000001,
+              "preview": "Header: Scope of the Policy\n\n2"
+            }
+          ],
+          "createdAt": "2026-08-19T06:38:28.793Z"
+        }
+      ]
+    },
+    {
+      "id": "0eac7619-f88e-418a-a5e0-1b3cf9cf7791",
+      "title": "What is this knowledge base...",
+      "createdAt": "2026-08-19T14:15:50.476Z",
+      "updatedAt": "2026-08-19T14:16:04.346Z",
+      "messages": [
+        {
+          "id": "3fedca93-f33a-4eb2-96db-04f7bf34a1c3",
+          "sender": "user",
+          "content": "What is this knowledge base about?",
+          "createdAt": "2026-08-19T14:15:50.479Z"
+        },
+        {
+          "id": "c58a9c83-7f56-4f3e-89f9-312c4ad2e618",
+          "sender": "assistant",
+          "content": "The knowledge base focuses on retrieval‑augmented generation (RAG) and related techniques for building and querying knowledge sources. It covers:\n\n* **Iterative retrieval** – repeatedly searching a knowledge base using the original query and the text generated so far.  \n* **Indexing optimization** – using knowledge graphs (KGs) to create hierarchical document indexes that capture logical relationships and improve retrieval accuracy.  \n* **Structured vs. unstructured data** – describing how knowledge graphs, graph neural networks, and large language models (LLMs) are combined with text corpora (e.g., Wikipedia, HotpotQA, DPR) for open‑domain question answering.  \n\nIn short, the knowledge base is about methods for organizing, indexing, and retrieving information—especially via knowledge graphs and iterative retrieval—to enhance LLM‑driven question answering systems.",
+          "sources": [
+            {
+              "document_id": "testing-doc",
+              "filename": "2312.10997v5.pdf",
+              "page": 10,
+              "relevance": 0.7593421935,
+              "relevanceScore": 0.7593421935,
+              "preview": "Header: A. Iterative Retrieval\n\nIterative retrieval is a process where the knowledge base is repeatedly searched based on the initial query and the text generated so far, providing a more comprehensive knowledge\n\n10"
+            },
+            {
+              "document_id": "testing-doc",
+              "filename": "2312.10997v5.pdf",
+              "page": 7,
+              "relevance": 0.748210445,
+              "relevanceScore": 0.748210445,
+              "preview": "Header: 6\n\nStructured data, such as knowledge graphs (KGs) [86] , which are typically verified and can provide more precise in- formation. KnowledGPT [15] generates KB search queries and stores knowledge in a personalized base, enhancing the RAG model’s knowledge richness. In res..."
+            },
+            {
+              "document_id": "testing-doc",
+              "filename": "2312.10997v5.pdf",
+              "page": 8,
+              "relevance": 0.7115659715,
+              "relevanceScore": 0.7115659715,
+              "preview": "Header: B. Indexing Optimization\n\nKnowledge Graph index. Utilize KG in constructing the hierarchical structure of documents contributes to maintaining consistency. It delineates the connections between different concepts and entities, markedly reducing the potential for illusions..."
+            },
+            {
+              "document_id": "testing-doc",
+              "filename": "2312.10997v5.pdf",
+              "page": 18,
+              "relevance": 0.690983057,
+              "relevanceScore": 0.690983057,
+              "preview": "Header: 18\n\n[132] A. Talmor, J. Herzig, N. Lourie, and J. Berant, “Commonsenseqa: A question answering challenge targeting commonsense knowledge,” arXiv preprint arXiv:1811.00937, 2018.\n\n[133] E. Dinan, S. Roller, K. Shuster, A. Fan, M. Auli, and J. Weston, “Wizard of wikipedia: ..."
+            }
+          ],
+          "createdAt": "2026-08-19T14:16:04.346Z"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "profile": {
+      "name": "Enterprise User",
+      "email": "user@enterprise.com"
+    },
+    "appearance": {
+      "theme": "dark"
+    },
+    "notifications": {
+      "email": true,
+      "push": false
+    },
+    "aiPreferences": {
+      "model": "llama-3.3-70b-versatile",
+      "temperature": 0
+    },
+    "dataPreferences": {
+      "storeHistory": true
+    }
+  }
+}

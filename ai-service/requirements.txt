@@ -6,8 +6,8 @@ langchain_huggingface
 langchain_pinecone 
 langchain_text_splitters 
 langgraph 
-python-dotenv 
-"unstructured[pdf]" 
+python-dotenv
+unstructured[pdf]
 unstructured-inference 
 google-genai 
 sentence-transformers

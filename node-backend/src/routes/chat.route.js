@@ -5,6 +5,8 @@ import {
     getEmployeeChatsController,
     getChatWithMessagesController,
     sendMessageController,
+    renameChatController,
+    deleteChatController,
 } from "../controllers/chat.controller.js";
 
 import { authenticateUser } from "../middleware/auth.middleware.js";
@@ -40,6 +42,20 @@ router.get(
     "/:chatId",
     authenticateUser,
     getChatWithMessagesController
+);
+
+// Rename a chat
+router.put(
+    "/:chatId",
+    authenticateUser,
+    renameChatController
+);
+
+// Delete a chat
+router.delete(
+    "/:chatId",
+    authenticateUser,
+    deleteChatController
 );
 
 

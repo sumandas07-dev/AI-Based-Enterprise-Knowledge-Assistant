@@ -10,22 +10,25 @@ import {
   ChevronLeft, 
   ChevronRight,
   BookOpen,
-  Plus
+  Plus,
+  Users
 } from 'lucide-react';
 import { documentApi } from '../../api/api';
+import { useAuth } from '../../context/AuthContext';
 
 export const Sidebar = ({ 
   collapsed, 
   setCollapsed,
   onMobileClose
 }) => {
+  const { role } = useAuth();
   const [stats, setStats] = useState({ total: 0, indexed: 0 });
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const docs = await documentApi.getDocuments();
-        const indexedDocs = docs.filter(d => d.status === 'Indexed');
+        const indexedDocs = docs.filter(d => d.status === 'Indexed' || d.status === 'completed');
         setStats({
           total: docs.length,
           indexed: indexedDocs.length
@@ -35,17 +38,22 @@ export const Sidebar = ({
       }
     };
     fetchStats();
-    const interval = setInterval(fetchStats, 8000);
+    const interval = setInterval(fetchStats, 10000); // 10 second interval is sufficient
     return () => clearInterval(interval);
   }, []);
 
-  const navItems = [
-    { to: '/dashboard', label: 'Chat History', icon: History },
-    { to: '/documents', label: 'Documents', icon: FileText },
-    { to: '/sources', label: 'Sources', icon: Database },
-    { to: '/settings', label: 'Settings', icon: Settings },
-    { to: '/about', label: 'About', icon: Info },
-  ];
+  const navItems = role === 'admin'
+    ? [
+        { to: '/admin', label: 'Admin Dashboard', icon: BookOpen },
+        { to: '/admin/employees', label: 'Employees', icon: Users },
+        { to: '/admin/documents', label: 'Document Ingest', icon: Database },
+        { to: '/admin/statistics', label: 'Analytics', icon: History },
+        { to: '/dashboard', label: 'AI Chat Console', icon: MessageSquare },
+        { to: '/settings', label: 'Settings', icon: Settings },
+      ]
+    : [
+        { to: '/dashboard', label: 'AI Chat Assistant', icon: MessageSquare },
+      ];
 
   return (
     <div 
@@ -125,7 +133,7 @@ export const Sidebar = ({
       {/* Bottom Section */}
       <div className="p-4 border-t border-border-subtle flex flex-col gap-4">
         {/* Knowledge Base Stats card */}
-        {!collapsed && (
+        {!collapsed && role !== 'employee' && (
           <div className="bg-panel-light p-3.5 rounded-xl border border-border-subtle flex flex-col gap-1.5 animate-fade-in">
             <span className="text-[9px] font-bold tracking-wider text-accent-purple uppercase">Knowledge Base</span>
             <div className="grid grid-cols-2 gap-2 mt-1">

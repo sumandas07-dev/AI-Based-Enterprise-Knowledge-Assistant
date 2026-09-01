@@ -340,3 +340,79 @@ export const createEmployeesFromExcel = async (fileUrl) => {
         failedEmployees,
     };
 };
+
+// Retrieve all employees (with optional search filter)
+export const getEmployees = async (searchQuery = "") => {
+    let query = {};
+    if (searchQuery && typeof searchQuery === "string" && searchQuery.trim()) {
+        const regex = new RegExp(searchQuery.trim(), "i");
+        query = {
+            $or: [
+                { name: regex },
+                { email: regex },
+                { empId: regex },
+                { department: regex }
+            ]
+        };
+    }
+    return await Employee.find(query).sort({ createdAt: -1 }).lean();
+};
+
+// Retrieve employee by ID
+export const getEmployeeById = async (id) => {
+    const employee = await Employee.findById(id).lean();
+    if (!employee) {
+        throw new Error("Employee not found");
+    }
+    return employee;
+};
+
+// Update employee details
+export const updateEmployee = async (id, body) => {
+    const { name, department, email } = body || {};
+
+    if (!name || !email) {
+        throw new Error("Name and email are required");
+    }
+
+    const employee = await Employee.findById(id);
+    if (!employee) {
+        throw new Error("Employee not found");
+    }
+
+    // Check if new email clashes with another employee
+    const normalizedEmail = String(email).trim().toLowerCase();
+    if (normalizedEmail !== employee.email) {
+        const clash = await Employee.findOne({ email: normalizedEmail });
+        if (clash) {
+            throw new Error("Email already registered to another employee");
+        }
+    }
+
+    employee.name = name.trim();
+    employee.department = department ? department.trim() : "";
+    employee.email = normalizedEmail;
+
+    await employee.save();
+    return employee;
+};
+
+// Toggle active status
+export const toggleEmployeeStatus = async (id) => {
+    const employee = await Employee.findById(id);
+    if (!employee) {
+        throw new Error("Employee not found");
+    }
+    employee.isActive = !employee.isActive;
+    await employee.save();
+    return employee;
+};
+
+// Delete employee
+export const deleteEmployee = async (id) => {
+    const employee = await Employee.findById(id);
+    if (!employee) {
+        throw new Error("Employee not found");
+    }
+    await Employee.deleteOne({ _id: id });
+};

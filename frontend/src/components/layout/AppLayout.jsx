@@ -12,9 +12,13 @@ export const AppLayout = () => {
   // Map path to page titles
   const getPageTitle = () => {
     const path = location.pathname;
+    if (path.startsWith('/admin/employees')) return 'Employee Database';
+    if (path.startsWith('/admin/documents')) return 'Knowledge Base Ingestion';
+    if (path.startsWith('/admin/statistics')) return 'Analytics Dashboard';
+    if (path.startsWith('/admin')) return 'Admin Overview';
     if (path.startsWith('/dashboard')) return 'AI Knowledge Assistant';
     if (path.startsWith('/history')) return 'Conversation History';
-    if (path.startsWith('/documents')) return 'Knowledge Base Documents';
+    if (path.startsWith('/documents')) return 'Available Documents';
     if (path.startsWith('/sources')) return 'RAG Document Sources';
     if (path.startsWith('/settings')) return 'System Settings';
     if (path.startsWith('/about')) return 'About & Architecture';

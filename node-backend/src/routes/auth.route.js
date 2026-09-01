@@ -7,7 +7,9 @@ import {
     forgotPassword,
     verifyOtp,
     signupAdmin,
+    getMe,
 } from "../controllers/auth.controller.js";
+import { authenticateUser } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
@@ -51,5 +53,8 @@ router.post("/employee/forgot-password", forgotPassword);
 
 // Verify OTP
 router.post("/employee/verify-otp", verifyOtp);
+
+// Get current user details and role
+router.get("/me", authenticateUser, getMe);
 
 export default router;

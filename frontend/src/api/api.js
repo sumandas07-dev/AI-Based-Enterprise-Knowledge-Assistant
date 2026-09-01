@@ -5,6 +5,7 @@ const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
 
 export const apiClient = axios.create({
   baseURL,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -19,7 +20,7 @@ let localSettings = { ...mockSettings };
 async function checkBackendAvailable() {
   try {
     // Ping backend server health endpoint
-    await axios.get(`${baseURL.replace('/api', '')}/health`, { timeout: 600 });
+    await axios.get(`${baseURL.replace('/api', '')}/health`, { timeout: 5000 });
     return true;
   } catch {
     return false;
@@ -28,11 +29,66 @@ async function checkBackendAvailable() {
 
 export const authApi = {
   getCurrentUser: async () => {
-    return { name: "Enterprise Admin", email: "admin@enterprise.com" };
+    const isOnline = await checkBackendAvailable();
+    if (isOnline) {
+      try {
+        const res = await apiClient.get('/auth/me');
+        return res.data?.user || null;
+      } catch (e) {
+        return null;
+      }
+    }
+    // Mock user for offline mode
+    return { id: "mock-admin-id", name: "Enterprise Admin", email: "admin@enterprise.com", role: "admin" };
   },
-  isAuthenticated: () => true, // Bypass authentication for development
-  logout: () => {
-    console.log("Logged out placeholder called.");
+  signupAdmin: async (companyName, name, email, password) => {
+    const response = await apiClient.post('/auth/admin/signup', {
+      company_name: companyName,
+      name,
+      email,
+      password
+    });
+    return response.data;
+  },
+  login: async (email, password, role) => {
+    const response = await apiClient.post(`/auth/${role}/login`, {
+      email,
+      password,
+      loginType: role
+    });
+    return response.data;
+  },
+  logout: async (role) => {
+    await apiClient.post(`/auth/${role}/logout`);
+  },
+  forgotPassword: async (email, role) => {
+    const response = await apiClient.post(`/auth/${role}/forgot-password`, { email, loginType: role });
+    return response.data;
+  },
+  verifyOtp: async (email, otp, role) => {
+    const response = await apiClient.post(`/auth/${role}/verify-otp`, { email, otp, loginType: role });
+    return response.data;
+  },
+  resetPassword: async (email, otp, newPassword, role) => {
+    const response = await apiClient.post(`/auth/${role}/reset-password`, {
+      email,
+      resetToken: otp,
+      newPassword,
+      loginType: role
+    });
+    return response.data;
+  },
+  resetPasswordFirstLogin: async (email, currentPassword, newPassword, role) => {
+    const response = await apiClient.post(`/auth/${role}/reset-password`, {
+      email,
+      currentPassword,
+      newPassword,
+      loginType: role
+    });
+    return response.data;
+  },
+  isAuthenticated: () => {
+    return true; // Managed inside AuthContext.jsx
   }
 };
 
@@ -77,7 +133,6 @@ export const historyApi = {
       convo.title = title;
       convo.updatedAt = new Date().toISOString();
     }
-    return convo;
   },
   deleteConversation: async (id) => {
     const isOnline = await checkBackendAvailable();
@@ -99,40 +154,39 @@ export const documentApi = {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress
       });
-      return res.data;
+      return res.data?.document || res.data;
     }
 
     // Mock upload
     console.log("Backend offline. Simulating mock document upload.");
     const id = `doc-${Math.random().toString(36).substring(2, 9)}`;
     const newDoc = {
-      id,
+      _id: id,
       filename: file.name,
       type: 'pdf',
       size: file.size,
       createdAt: new Date().toISOString(),
-      status: 'Indexed'
+      status: 'completed'
     };
-    localDocuments.unshift(newDoc);
     return newDoc;
   },
   getDocuments: async () => {
     const isOnline = await checkBackendAvailable();
     if (isOnline) {
       const res = await apiClient.get('/documents');
-      return res.data;
+      return res.data?.documents || [];
     }
-    return localDocuments;
+    return [
+      { _id: "doc-1", filename: "Mock_Enterprise_Guide.pdf", status: 'completed', createdAt: new Date().toISOString() }
+    ];
   },
   getDocument: async (id) => {
     const isOnline = await checkBackendAvailable();
     if (isOnline) {
       const res = await apiClient.get(`/documents/${id}`);
-      return res.data;
+      return res.data?.document;
     }
-    const doc = localDocuments.find(d => d.id === id);
-    if (!doc) throw new Error("Document not found");
-    return doc;
+    return { _id: id, filename: "Mock_Enterprise_Guide.pdf", status: 'completed', createdAt: new Date().toISOString() };
   },
   deleteDocument: async (id) => {
     const isOnline = await checkBackendAvailable();
@@ -140,24 +194,91 @@ export const documentApi = {
       await apiClient.delete(`/documents/${id}`);
       return;
     }
-    localDocuments = localDocuments.filter(d => d.id !== id);
   },
   getSources: async () => {
     const isOnline = await checkBackendAvailable();
     if (isOnline) {
-      const res = await apiClient.get('/sources');
-      return res.data;
+      const res = await apiClient.get('/documents');
+      const documents = res.data?.documents || [];
+      return documents.filter(d => d.status === 'completed').map((doc, idx) => ({
+        id: doc._id,
+        filename: doc.filename,
+        type: 'pdf',
+        size: 1024 * 1024,
+        relevanceScore: 0.95 - (idx * 0.05) > 1.0 ? 0.98 : 0.95 - (idx * 0.05),
+        createdAt: doc.createdAt
+      }));
     }
-    // Convert documents to sources
-    return localDocuments.filter(d => d.status === 'Indexed').map((doc, idx) => ({
-      id: doc.id,
-      filename: doc.filename,
-      type: doc.type,
-      size: doc.size,
-      relevanceScore: 0.82 + (idx * 0.05) > 1.0 ? 0.98 : 0.82 + (idx * 0.05),
-      pageCount: 3 + idx,
-      createdAt: doc.createdAt
-    }));
+    return [
+      { id: "doc-1", filename: "Mock_Enterprise_Guide.pdf", type: 'pdf', size: 1024 * 1024, relevanceScore: 0.92, createdAt: new Date().toISOString() }
+    ];
+  }
+};
+
+export const employeeApi = {
+  getEmployees: async (search = "") => {
+    const isOnline = await checkBackendAvailable();
+    if (isOnline) {
+      const res = await apiClient.get(`/employees?search=${search}`);
+      return res.data?.employees || [];
+    }
+    return [
+      { _id: "1", empId: "EMP001", name: "Alice Smith", email: "alice@enterprise.com", department: "HR", isActive: true },
+      { _id: "2", empId: "EMP002", name: "Bob Johnson", email: "bob@enterprise.com", department: "Engineering", isActive: false }
+    ];
+  },
+  getEmployee: async (id) => {
+    const isOnline = await checkBackendAvailable();
+    if (isOnline) {
+      const res = await apiClient.get(`/employees/${id}`);
+      return res.data?.employee;
+    }
+    return { _id: id, empId: "EMP001", name: "Alice Smith", email: "alice@enterprise.com", department: "HR", isActive: true };
+  },
+  createEmployee: async (empData) => {
+    const res = await apiClient.post('/employees', empData);
+    return res.data;
+  },
+  updateEmployee: async (id, empData) => {
+    const res = await apiClient.put(`/employees/${id}`, empData);
+    return res.data;
+  },
+  toggleStatus: async (id) => {
+    const res = await apiClient.put(`/employees/${id}/toggle-status`);
+    return res.data;
+  },
+  deleteEmployee: async (id) => {
+    const res = await apiClient.delete(`/employees/${id}`);
+    return res.data;
+  },
+  importEmployees: async (file, onUploadProgress) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await apiClient.post('/employees/import', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress
+    });
+    return res.data;
+  }
+};
+
+export const statisticsApi = {
+  getStatistics: async () => {
+    const isOnline = await checkBackendAvailable();
+    if (isOnline) {
+      const res = await apiClient.get('/statistics');
+      return res.data?.statistics;
+    }
+    return {
+      totalEmployees: 2,
+      activeEmployees: 1,
+      inactiveEmployees: 1,
+      totalDocuments: 1,
+      indexedDocuments: 1,
+      failedDocuments: 0,
+      processingDocuments: 0,
+      totalChats: 5
+    };
   }
 };
 

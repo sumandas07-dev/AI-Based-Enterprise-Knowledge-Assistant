@@ -40,6 +40,7 @@ export const login = async (req, res, next) => {
 
         res.status(200).json({
             message: "Login Successfully...",
+            role: result.role,
             requiresPasswordReset: result.requiresPasswordReset,
         });
     } catch (error) {
@@ -117,6 +118,48 @@ export const verifyOtp = async (req, res, next) => {
         const result = await verifyOtpService(req.body);
 
         res.status(200).json(result);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getMe = async (req, res, next) => {
+    try {
+        const userId = req.user?.userId;
+        const role = req.user?.role;
+
+        if (!userId || !role) {
+            return res.status(401).json({
+                success: false,
+                message: "Unauthorized",
+            });
+        }
+
+        let userDetails = null;
+        if (role === "admin") {
+            const Admin = (await import("../models/admin.schema.js")).default;
+            userDetails = await Admin.findById(userId).select("name email role").lean();
+        } else if (role === "employee") {
+            const Employee = (await import("../models/employee.schema.js")).default;
+            userDetails = await Employee.findById(userId).select("name email role").lean();
+        }
+
+        if (!userDetails) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            user: {
+                id: userDetails._id,
+                name: userDetails.name,
+                email: userDetails.email,
+                role: userDetails.role,
+            },
+        });
     } catch (error) {
         next(error);
     }

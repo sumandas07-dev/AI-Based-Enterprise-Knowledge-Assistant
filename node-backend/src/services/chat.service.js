@@ -234,3 +234,29 @@ export const sendMessage = async (
         throw error;
     }
 };
+
+// Rename a chat title
+export const renameChat = async (chatId, employeeId, newTitle) => {
+    // Verifies ownership
+    await getChatById(chatId, employeeId);
+    
+    const updatedChat = await Chat.findByIdAndUpdate(
+        chatId,
+        { title: newTitle },
+        { new: true }
+    ).lean();
+
+    return updatedChat;
+};
+
+// Delete a chat and all its messages
+export const deleteChat = async (chatId, employeeId) => {
+    // Verifies ownership
+    await getChatById(chatId, employeeId);
+
+    // Delete messages
+    await Message.deleteMany({ chatId });
+
+    // Delete chat session
+    await Chat.deleteOne({ _id: chatId });
+};

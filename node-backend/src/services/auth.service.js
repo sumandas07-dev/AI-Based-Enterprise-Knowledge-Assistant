@@ -104,6 +104,7 @@ export const loginUser = async (body) => {
     return {
         accessToken,
         refreshToken,
+        role: user.role,
         requiresPasswordReset:
             loginType === "employee" && user.isFirstLogin,
     };

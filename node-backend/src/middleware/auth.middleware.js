@@ -1,7 +1,8 @@
 import { verifyAccessToken } from "../utils/jwt.js";
+import Employee from "../models/employee.schema.js";
 
 
-const authenticateUser = (req, res, next) => {
+const authenticateUser = async (req, res, next) => {
     try {
         const token = req.cookies?.accessToken;
 
@@ -35,7 +36,29 @@ const authenticateUser = (req, res, next) => {
     }
 };
 
+const requireAdmin = (req, res, next) => {
+    if (req.user?.role !== "admin") {
+        return res.status(403).json({
+            success: false,
+            message: "Access denied. Admin role required.",
+        });
+    }
+    next();
+};
+
+const requireEmployee = (req, res, next) => {
+    if (req.user?.role !== "employee" && req.user?.role !== "admin") {
+        return res.status(403).json({
+            success: false,
+            message: "Access denied. Employee role required.",
+        });
+    }
+    next();
+};
+
 
 export {
     authenticateUser,
+    requireAdmin,
+    requireEmployee,
 };

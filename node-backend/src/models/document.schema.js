@@ -12,7 +12,7 @@ const docSchema = new Schema({
     },
     uploadedBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "AdminUser",
+        ref: "admin",
         required: true,
     },
     status: {

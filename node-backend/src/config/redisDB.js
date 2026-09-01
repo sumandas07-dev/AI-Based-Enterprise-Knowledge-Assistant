@@ -6,7 +6,11 @@ const redisClient = createClient({
     password: envConfig.REDIS_PASSWORD,
     socket: {
         host: envConfig.REDIS_HOST,
-        port: Number(envConfig.REDIS_PORT)
+        port: Number(envConfig.REDIS_PORT),
+        reconnectStrategy: (retries) => {
+            // Keep retrying in the background every 5 seconds without crashing the server
+            return 5000;
+        }
     }
 });
 
@@ -20,7 +24,7 @@ const connectRedis = async () => {
         console.log("Redis DB connected successfully...");
     } catch(err) {
         console.error('Redis connection failed...', err.message);
-        process.exit(1);
+        console.warn('Continuing server startup without Redis (Redis features will be disabled)...');
     }
 };
 

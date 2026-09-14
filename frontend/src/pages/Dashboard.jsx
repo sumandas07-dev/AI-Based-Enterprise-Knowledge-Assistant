@@ -62,7 +62,7 @@ export const Dashboard = () => {
         setMessages(convo.messages || []);
         
         // Load sources from the last assistant message in this convo
-        const assistantMsgs = convo.messages.filter(m => m.sender === 'assistant');
+        const assistantMsgs = convo.messages.filter(m => m.sender === 'assistant' || m.role === 'assistant');
         if (assistantMsgs.length > 0) {
           const lastMsg = assistantMsgs[assistantMsgs.length - 1];
           setSources(lastMsg.sources || []);
@@ -132,10 +132,11 @@ export const Dashboard = () => {
       }, 500);
 
     } catch (err) {
-      console.error(err);
+      console.error('Chat error:', err);
       setRagStage('error');
+      const backendMessage = err.response?.data?.message || err.response?.data?.error;
       setErrorMsg(
-        err.response?.data?.error || 
+        backendMessage || 
         'Unable to query the knowledge database. Please verify backend services are active.'
       );
     } finally {
@@ -210,8 +211,8 @@ export const Dashboard = () => {
                 className="bg-panel-dark border border-border-subtle text-[9px] text-text-primary px-2 py-1 rounded-md focus:outline-none focus:border-border-focus cursor-pointer font-bold uppercase max-w-[150px] truncate"
               >
                 <option value="">All Documents</option>
-                {documents.filter(d => d.status === 'Indexed').map(d => (
-                  <option key={d.id} value={d.id}>{d.filename}</option>
+                {documents.filter(d => d.status === 'completed' || d.status === 'Indexed').map(d => (
+                  <option key={d._id || d.id} value={d._id || d.id}>{d.filename}</option>
                 ))}
               </select>
             </div>

@@ -43,7 +43,7 @@ export const ChatWindow = ({
   return (
     <div className="flex flex-col gap-6 px-6 py-6 overflow-y-auto h-full min-h-0 bg-background">
       {messages.map((message, index) => {
-        const isUser = message.sender === 'user';
+        const isUser = message.sender === 'user' || message.role === 'user';
         const isLast = index === messages.length - 1;
 
         return (

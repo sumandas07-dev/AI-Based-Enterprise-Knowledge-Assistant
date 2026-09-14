@@ -1,7 +1,7 @@
 import axios from "axios";
 
 
-const AI_SERVICE_URL = "http://127.0.0.1:8001";
+const AI_SERVICE_URL = "http://127.0.0.1:8000";
 
 
 export const queryAI = async ({

@@ -2,7 +2,7 @@ import axios from "axios";
 import Document from "../models/document.schema.js";
 import { uploadPDFToCloudinary, deletePDFFromCloudinary } from "./cloudinary.service.js";
 
-const AI_SERVICE_URL = "http://127.0.0.1:8001";
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "http://127.0.0.1:8000";
 
 // Helper to extract Cloudinary Public ID from URL
 const getPublicIdFromUrl = (url) => {

@@ -108,7 +108,22 @@ export const historyApi = {
     const isOnline = await checkBackendAvailable();
     if (isOnline) {
       const res = await apiClient.get('/history');
-      return res.data;
+      const rawChats = res.data?.chats || (Array.isArray(res.data) ? res.data : []);
+      return rawChats.map(c => {
+        const dateObj = new Date(c.updatedAt || c.createdAt || Date.now());
+        const now = new Date();
+        const diffDays = Math.floor((now - dateObj) / (1000 * 60 * 60 * 24));
+        let group = 'Today';
+        if (diffDays === 1) group = 'Yesterday';
+        else if (diffDays > 1) group = 'Previous 7 days';
+
+        return {
+          id: c._id || c.id,
+          title: c.title || "Untitled Session",
+          date: dateObj.toISOString(),
+          group
+        };
+      });
     }
     return localHistory;
   },
@@ -116,7 +131,20 @@ export const historyApi = {
     const isOnline = await checkBackendAvailable();
     if (isOnline) {
       const res = await apiClient.get(`/history/${id}`);
-      return res.data;
+      const rawChat = res.data?.chat;
+      const rawMessages = res.data?.messages || [];
+      return {
+        id: rawChat?._id || id,
+        title: rawChat?.title || "Chat Session",
+        messages: rawMessages.map(m => ({
+          id: m._id || m.id,
+          sender: m.role || m.sender || 'assistant',
+          role: m.role || m.sender,
+          content: m.content,
+          sources: m.sources || [],
+          createdAt: m.createdAt || new Date().toISOString()
+        }))
+      };
     }
     const convo = localHistory.find(c => c.id === id);
     if (!convo) throw new Error("Conversation not found");
@@ -200,8 +228,8 @@ export const documentApi = {
     if (isOnline) {
       const res = await apiClient.get('/documents');
       const documents = res.data?.documents || [];
-      return documents.filter(d => d.status === 'completed').map((doc, idx) => ({
-        id: doc._id,
+      return documents.filter(d => d.status === 'completed' || d.status === 'Indexed').map((doc, idx) => ({
+        id: doc._id || doc.id,
         filename: doc.filename,
         type: 'pdf',
         size: 1024 * 1024,
